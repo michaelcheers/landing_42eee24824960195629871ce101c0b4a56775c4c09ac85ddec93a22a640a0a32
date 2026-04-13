@@ -104,6 +104,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   font-size: 22px; font-weight: 700; color: var(--ink);
   display: flex; align-items: center; gap: 7px;
   transition: color var(--t);
+  white-space: nowrap;
 }
 .nav-phone a:hover { color: var(--fire); }
 .nav-phone a svg { width: 18px; height: 18px; stroke: var(--fire); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -868,6 +869,8 @@ footer a { color: var(--fire); }
 }
 @media (max-width: 900px) {
   .wrap { padding: 0 24px; }
+  .nav { padding: 0 24px; }
+  .nav-phone a { font-size: 18px; }
   .hero { padding: 72px 24px 24px; }
   .hero-inner { grid-template-columns: 1fr; gap: 48px; }
   .hero-card { border-radius: 16px; margin-top: 0; }
@@ -890,6 +893,9 @@ footer a { color: var(--fire); }
   .promo-sep { display: none; }
 }
 @media (max-width: 640px) {
+  .nav-phone a { font-size: 16px; }
+  .nav-phone small { font-size: 9px; }
+  .tr-logo-img { height: 36px; }
   .hero-ctas { flex-direction: column; }
   .hero-h1 { font-size: 40px; }
   .hc-row2 { grid-template-columns: 1fr; }
