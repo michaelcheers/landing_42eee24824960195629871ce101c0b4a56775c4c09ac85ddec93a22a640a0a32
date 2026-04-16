@@ -1687,27 +1687,36 @@ footer a { color: var(--fire); }
   document.getElementById('hero-sub').textContent = cfg.sub;
 })();
 
-// ── SHARED API SUBMIT (Granot CRM) — DISABLED, superseded by Service1 ──
-/*
+// ── SHARED API SUBMIT (Granot / HelloMoving Leads Gateway) ───
+// Per Granot Leads Posting Gateway Dev Guide (rev 2026-03-09):
+//   POST to LEADSGWHTTP.lidgw with API_ID + MOVERREF in the URL,
+//   all other fields form-urlencoded in the body.
 function submitToGranot(data, formEl) {
-  var params = new URLSearchParams(window.location.search);
+  // Convert YYYY-MM-DD from <input type="date"> to MM/DD/YYYY (mandatory format)
+  var movedte = '';
+  if (data.date) {
+    var parts = data.date.split('-'); // [YYYY, MM, DD]
+    if (parts.length === 3) movedte = parts[1] + '/' + parts[2] + '/' + parts[0];
+  }
 
-  var body = {
-    apikey: '', // TODO: Granot API key pending from client (Ohad)
-    firstname: data.firstname || '',
-    lastname: data.lastname || '',
-    email: data.email || '',
-    mobile: data.phone || '',
-    fromzipcode: data.from || '',
-    tozipcode: data.to || '',
-    pickupdate: data.date ? data.date.replace(/-/g, '/') : '',
-    servicetypeid: 101 // Local Move
-  };
+  var body = new URLSearchParams();
+  body.set('servtypeid', '101'); // Local Move
+  body.set('firstname',  data.firstname || '');
+  body.set('lastname',   data.lastname  || '');
+  body.set('ozip',       data.from      || '');
+  body.set('dzip',       data.to        || '');
+  body.set('movedte',    movedte);
+  body.set('email',      data.email     || '');
+  body.set('phone1',     data.phone     || '');
+  body.set('consent',    '1');
 
-  fetch('https://www.granot.com/api/leads/submit', {
+  // API_ID and MOVERREF stay in the URL per spec (do NOT include in body).
+  var url = 'https://lead.hellomoving.com/LEADSGWHTTP.lidgw?&API_ID=7C67D66E10B3&MOVERREF=neta.a@titaniumrelocation.com';
+
+  fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString()
   }).catch(function(){});
 
   var successHTML = '<div class="form-success">' +
@@ -1718,9 +1727,9 @@ function submitToGranot(data, formEl) {
     '</div>';
   formEl.innerHTML = successHTML;
 }
-*/
 
-// ── SHARED API SUBMIT (Service1 CRM) ─────────────────────
+// ── SHARED API SUBMIT (Service1 CRM) — DISABLED, superseded by Granot ──
+/*
 function submitToService1(data, formEl) {
   var params = new URLSearchParams(window.location.search);
 
@@ -1761,11 +1770,12 @@ function submitToService1(data, formEl) {
     '</div>';
   formEl.innerHTML = successHTML;
 }
+*/
 
 // ── HERO FORM ─────────────────────────────────────────────
 function submitHeroForm() {
   var card = document.getElementById('hero-form-card');
-  submitToService1({
+  submitToGranot({
     from:      document.getElementById('h-from').value,
     to:        document.getElementById('h-to').value,
     firstname: document.getElementById('h-firstname').value,
@@ -1779,7 +1789,7 @@ function submitHeroForm() {
 // ── FOOTER FORM ───────────────────────────────────────────
 function submitFooterForm() {
   var card = document.getElementById('footer-form-card');
-  submitToService1({
+  submitToGranot({
     from:      document.getElementById('ff-from').value,
     to:        document.getElementById('ff-to').value,
     firstname: document.getElementById('ff-firstname').value,
