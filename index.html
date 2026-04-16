@@ -1687,7 +1687,8 @@ footer a { color: var(--fire); }
   document.getElementById('hero-sub').textContent = cfg.sub;
 })();
 
-// ── SHARED API SUBMIT (Granot CRM) ───────────────────────
+// ── SHARED API SUBMIT (Granot CRM) — DISABLED, superseded by Service1 ──
+/*
 function submitToGranot(data, formEl) {
   var params = new URLSearchParams(window.location.search);
 
@@ -1717,11 +1718,54 @@ function submitToGranot(data, formEl) {
     '</div>';
   formEl.innerHTML = successHTML;
 }
+*/
+
+// ── SHARED API SUBMIT (Service1 CRM) ─────────────────────
+function submitToService1(data, formEl) {
+  var params = new URLSearchParams(window.location.search);
+
+  var fullName = ((data.firstname || '') + ' ' + (data.lastname || '')).trim();
+
+  var details = [];
+  if (data.date) details.push('Move Date: ' + data.date);
+  if (data.from) details.push('From Zip: ' + data.from);
+  if (data.to)   details.push('To Zip: ' + data.to);
+
+  var body = {
+    companyId: 27,
+    fullName: fullName,
+    email: data.email || '',
+    phone: data.phone || '',
+    businessType: 'Residential Moving',
+    painPoint: details.join('\n'),
+    selectedDate: '',
+    selectedTime: '',
+    customerTimezone: 'America/Los_Angeles',
+    utmSource:   params.get('utm_source')   || '',
+    utmMedium:   params.get('utm_medium')   || '',
+    utmCampaign: params.get('utm_campaign') || '',
+    referrerUrl: document.referrer || ''
+  };
+
+  fetch('https://helloservice1.com/api/bookings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }).catch(function(){});
+
+  var successHTML = '<div class="form-success">' +
+    '<div class="form-success-ring"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>' +
+    '<h3>You\'re all set!</h3>' +
+    '<p>We received your request and will follow up shortly with your personalized estimate.</p>' +
+    '<a href="tel:+14083594496" class="btn-call"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.09 10.8a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 14v3z"/></svg>(408) 359-4496</a>' +
+    '</div>';
+  formEl.innerHTML = successHTML;
+}
 
 // ── HERO FORM ─────────────────────────────────────────────
 function submitHeroForm() {
   var card = document.getElementById('hero-form-card');
-  submitToGranot({
+  submitToService1({
     from:      document.getElementById('h-from').value,
     to:        document.getElementById('h-to').value,
     firstname: document.getElementById('h-firstname').value,
@@ -1735,7 +1779,7 @@ function submitHeroForm() {
 // ── FOOTER FORM ───────────────────────────────────────────
 function submitFooterForm() {
   var card = document.getElementById('footer-form-card');
-  submitToGranot({
+  submitToService1({
     from:      document.getElementById('ff-from').value,
     to:        document.getElementById('ff-to').value,
     firstname: document.getElementById('ff-firstname').value,
